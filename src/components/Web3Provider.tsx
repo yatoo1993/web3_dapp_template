@@ -15,12 +15,12 @@ import {
     trustWallet,
     walletConnectWallet,
   } from "@rainbow-me/rainbowkit/wallets";
-  import { configureChains, createClient, WagmiConfig } from "wagmi";
+  import { configureChains, createConfig, WagmiConfig } from "wagmi";
   import { mainnet } from "wagmi/chains";
   import { publicProvider } from "wagmi/providers/public";
-  
+  const projectId = import.meta.env.VITE_APP_API_projectId
   export function MyWeb3Provider({ children }: any) {
-    const { chains, provider } = configureChains(
+    const { chains, publicClient } = configureChains(
       [mainnet],
       [
         // infuraProvider({ apiKey: process.env.INFURA_KEY as string }),
@@ -32,33 +32,33 @@ import {
       {
         groupName: "Suggested",
         wallets: [
-          injectedWallet({ chains }),
+          injectedWallet({ chains,  projectId }),
           coinbaseWallet({ chains, appName: "Coinbase" }),
-          metaMaskWallet({ chains }),
-          trustWallet({ chains }),
-          imTokenWallet({ chains }),
-          walletConnectWallet({ chains }),
+          metaMaskWallet({ chains, projectId }),
+          trustWallet({ chains, projectId }),
+          imTokenWallet({ chains, projectId }),
+          walletConnectWallet({ chains, projectId }),
         ],
       },
       {
         groupName: "More",
         wallets: [
-          rainbowWallet({ chains }),
-          argentWallet({ chains }),
-          braveWallet({ chains }),
-          omniWallet({ chains }),
+          rainbowWallet({ chains,  projectId  }),
+          argentWallet({ chains, projectId }),
+          braveWallet({ chains, projectId }),
+          omniWallet({ chains, projectId }),
         ],
       },
     ]);
   
-    const wagmiClient = createClient({
+    const config = createConfig({
       autoConnect: true,
       connectors,
-      provider,
+      publicClient,
     });
   
     return (
-      <WagmiConfig client={wagmiClient}>
+      <WagmiConfig config={config}>
         <RainbowKitProvider chains={chains} coolMode>
           {children}
         </RainbowKitProvider>
